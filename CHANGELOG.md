@@ -2,6 +2,26 @@
 
 All notable changes to this plugin. The version is the one in `package.json`.
 
+## 0.3.1 — 2026-10-19
+
+### Fixed
+
+- **`wsl_job kill` left the workload running.** It matched `run.sh` and
+  `payload.sh` by command line, so a payload such as `python run_cos4.py` —
+  whose argv contains no job path — survived the kill and kept every core busy.
+  (Observed in practice: a "killed" run was still computing ten minutes later.)
+  `run.sh` now re-execs under `setsid`, records its process-group id in the job
+  directory, and `kill` signals the whole group (TERM, then KILL), reporting how
+  many processes remain in the session. Jobs started by an older version have no
+  pgid file and still use the pattern kill as a fallback. `setsid` is optional:
+  without it the job still runs, only the group signal is unavailable.
+
+### Tests
+
+- `jobtest` submits a job that writes a marker file after a short sleep, kills
+  it, and asserts the marker never appears — a behavioural check that the whole
+  process tree died, not just the wrapper shell. 28 → 30 checks.
+
 ## 0.3.0 — 2026-10-19
 
 0.2.0 worked, but only on the machine it was written on: the distribution, the

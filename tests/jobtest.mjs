@@ -156,9 +156,19 @@ check('status lists jobs', list.ok && list.text.includes(jobId), list.text)
 check('finished jobs are marked', new RegExp(jobId + '\\s+\\[finished\\]').test(list.text), list.text)
 
 console.log('\n=== kill a long job ===')
+// The payload writes a marker after a short sleep. If kill only stops the
+// wrapper shell and leaves the workload running, the marker appears and this
+// suite fails — that is the regression test for a kill that missed the
+// process tree.
+const marker = `${workdir}/killed-marker.txt`
+await call('wsl_sh', { script: `rm -f ${marker}` })
 const longJob = await call('wsl_job', {
   action: 'run', title: 'jobtest: long sleep, then killed', workdir,
-  code: 'import time\nprint("sleeping", flush=True)\ntime.sleep(300)\nprint("never printed", flush=True)',
+  code: `import time, os
+print('sleeping', flush=True)
+time.sleep(10)
+open(${JSON.stringify('killed-marker.txt')}, 'w').write('survived')
+print('never printed', flush=True)`,
 })
 const longId = /job started: (\S+)/.exec(longJob.text)?.[1]
 check('long job submitted', Boolean(longId), longJob.text)
@@ -168,11 +178,16 @@ if (longId) {
   check('long job is still running', /\[running\]/.test(before.text), before.text)
   const killed = await call('wsl_job', { action: 'kill', id: longId })
   console.log(killed.text)
+  check('kill reports no survivors', /remaining processes.*: 0\b|remaining processes: 0/.test(killed.text), killed.text)
   const after = await call('wsl_job', { action: 'status', id: longId })
   check('kill marks the job finished', /\[finished\]/.test(after.text), after.text)
   const logs = await call('wsl_job', { action: 'logs', id: longId })
   check('killed job never printed its tail', !logs.text.includes('never printed'), logs.text)
   check('killed job logged its start', logs.text.includes('sleeping'), logs.text)
+  console.log('  waiting out the payload\'s sleep to see whether it survived…')
+  await sleep(11000)
+  const survived = await call('wsl_sh', { script: `test -f ${marker} && echo PRESENT || echo ABSENT` })
+  check('the workload process tree is really gone', survived.text.includes('ABSENT'), survived.text)
 }
 
 console.log(`\n${pass} passed, ${fail} failed`)
