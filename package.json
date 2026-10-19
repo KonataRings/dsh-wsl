@@ -1,0 +1,47 @@
+{
+  "name": "dsh-wsl",
+  "version": "0.3.0",
+  "description": "WSL compute backend for DeepSeek Harness on Windows: run Python in a conda environment and bash scripts through stdin (no quote nesting), with auto-detected distribution/home/conda, path translation and resumable long jobs.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "selftest.mjs",
+    "tests",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "wsl",
+    "windows",
+    "conda",
+    "pyscf"
+  ],
+  "license": "MIT",
+  "author": "Wenzhe Du",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KonataRings/dsh-wsl.git"
+  },
+  "scripts": {
+    "test": "node selftest.mjs",
+    "test:live": "node tests/drivetest.mjs && node tests/jobtest.mjs"
+  }
+}
