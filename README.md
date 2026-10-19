@@ -149,14 +149,17 @@ Each job owns a directory. The provenance record is written after launch, in a s
 ## Testing
 
 ```sh
-node selftest.mjs        # offline: contract, distro-list parsing, path translation, noise filter
-node tests/drivetest.mjs # live: detection + every tool against a real distribution
-node tests/jobtest.mjs   # live: submit a job, poll it, tail logs, collect, kill
+node selftest.mjs           # offline: contract, distro-list parsing, path translation, noise filter
+node tests/drivetest.mjs    # live: detection + every tool against a real distribution
+node tests/jobtest.mjs      # live: submit a job, poll it, tail logs, collect, kill
+node tests/edgecases.mjs    # live: hostile paths, failed jobs, timeouts, injection shapes
 ```
 
 `selftest.mjs` needs no WSL and runs anywhere: it registers the tools through a mock registry that enforces the same rules as `@deepseek-ai/dsh-tools`, then checks the pure functions. It also asserts that no default carries a machine-specific path.
 
-The two live tests execute real commands in your distribution and exit non-zero on any failed check. Both detect the environment the same way the plugin does and accept `DSH_WSL_TEST_DISTRO`, `DSH_WSL_TEST_HOME`, `DSH_WSL_TEST_CONDA` and `DSH_WSL_TEST_ENV` as overrides.
+The live tests execute real commands in your distribution and exit non-zero on any failed check. All of them detect the environment the same way the plugin does and accept `DSH_WSL_TEST_DISTRO`, `DSH_WSL_TEST_HOME`, `DSH_WSL_TEST_CONDA` and `DSH_WSL_TEST_ENV` as overrides.
+
+`edgecases.mjs` is the one that catches the failures a happy-path suite cannot: a workdir with spaces, a quote and Chinese characters; a job that exits non-zero (its record has to stay parseable); a 1.5 s timeout; 200 KB of output; user code containing a heredoc delimiter; environment/workdir/package names shaped like shell injection; and the whole no-conda mode.
 
 ## Limitations
 

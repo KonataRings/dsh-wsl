@@ -42,6 +42,6 @@
   },
   "scripts": {
     "test": "node selftest.mjs",
-    "test:live": "node tests/drivetest.mjs && node tests/jobtest.mjs"
+    "test:live": "node tests/drivetest.mjs && node tests/jobtest.mjs && node tests/edgecases.mjs"
   }
 }

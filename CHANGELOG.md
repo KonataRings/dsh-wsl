@@ -46,6 +46,25 @@ WSL.
   value is now normalized to the no-conda mode.
 - `wsl_doctor` no longer assumes a conda installation when reporting the
   interpreter and package sections.
+- **A failed job corrupted its own status record.** GNU `time` appends
+  `Command exited with non-zero status N` to its `-o` file when the command
+  fails, so `maxrss_kb` held two lines and `wsl_job status` printed garbage
+  (`[8704] exit=7480`). The runner keeps only the RSS line, and the reader takes
+  the last line of every field.
+- **`wsl_env install` swallowed pip failures**: the trailing confirmation grep
+  ended with `|| true`, which became the script's exit status. It now exits with
+  pip's own code.
+- **Heredoc delimiters were fixed strings** (`DSH_WSL_PY_EOF`, …). Code
+  containing that exact line closed the heredoc early and the remainder ran as
+  shell. Delimiters are now random and checked against the payload.
+- **`~` was not expanded**, so `workdir: "~/project"` failed after quoting; it now
+  resolves to the detected home.
+- **`wsl_job run` accepted both `code` and `script`** when their contents differed
+  (the check compared strings instead of booleans).
+- **`wsl_job run` with an unavailable environment** now fails with the plugin's
+  own message instead of a bare "No such file" inside the job's stderr.
+- The environment inventory cache is cleared on reload, so a changed `condaRoot`
+  cannot serve a stale list.
 
 ### Tests
 
@@ -57,6 +76,10 @@ WSL.
   wrong-distribution error.
 - `tests/jobtest.mjs`: 28 checks, machine-independent work directory and
   provenance assertions.
+- `tests/edgecases.mjs`: 38 checks for the shapes that break naive
+  implementations — hostile workdirs, a failed job whose record must stay
+  parseable, timeout, giant output, heredoc delimiters inside user code,
+  injection-shaped environment/workdir/package names, and the no-conda mode.
 
 ## 0.2.0 — 2026-10-19
 
