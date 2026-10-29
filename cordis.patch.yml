@@ -1,5 +1,4 @@
-# dsh-wsl bundle patch: one host row. No client half — the tools are host-side
-# only, so loading them needs no browser refresh.
+# dsh-wsl bundle patch: one host row, host-side tools only (no client half).
 - insert:
     - id: dsh-wsl
-      name: dsh-wsl
+      name: "@konatarings/dsh-wsl"
