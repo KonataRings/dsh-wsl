@@ -102,31 +102,17 @@ Every tool returns text; a script exiting non-zero makes the tool call fail (`is
 The plugin is a normal DSH bundle: `package.json` with a `dsh.bundle.patch` entry, a bundle patch, and one ESM file exporting `name` and `apply`. No dependencies, no client half.
 
 ```sh
-cd <your DSH profile>/node_modules
-git clone https://github.com/KonataRings/dsh-wsl.git
-```
-
-Then declare it in the profile's `package.json`:
-
-```jsonc
-{
-  "dependencies": {
-    "dsh-wsl": "file:node_modules/dsh-wsl"
-  },
-  "dsh": {
-    "profile": {
-      "bundles": [
-        // …existing bundles…
-        "dsh-wsl"
-      ]
-    }
-  }
-}
+dsh plugin --profile <profile> add @konatarings/dsh-wsl
 ```
 
 Restart DSH and ask the model to run `wsl_doctor` — the first call pays for detection and prints what it found.
 
-A `file:` dependency is not resolved by the plugin CLI's own install path, which is why the two edits above are manual. A published package (or a git dependency) installs the normal way.
+For development, install a checkout directly:
+
+```sh
+git clone https://github.com/KonataRings/dsh-wsl.git
+dsh plugin --profile <profile> add link:/abs/path/to/dsh-wsl
+```
 
 ## Configuration
 
