@@ -2,6 +2,15 @@
 
 All notable changes to this plugin. The version is the one in `package.json`.
 
+## 0.3.2 — 2026-10-30
+
+### Changed
+
+- **Published as `@konatarings/dsh-wsl`.** The registry rejects the unscoped name `dsh-wsl`
+  as too similar to the existing package `is-wsl`. The bundle patch and the install
+  instructions now use the scoped name; tool names, the job directory and the config schema are
+  unchanged.
+
 ## 0.3.1 — 2026-10-19
 
 ### Fixed
