@@ -1,6 +1,6 @@
 {
-  "name": "dsh-wsl",
-  "version": "0.3.1",
+  "name": "@konatarings/dsh-wsl",
+  "version": "0.3.2",
   "description": "WSL compute backend for DeepSeek Harness on Windows: run Python in a conda environment and bash scripts through stdin (no quote nesting), with auto-detected distribution/home/conda, path translation and resumable long jobs.",
   "type": "module",
   "main": "lib/index.js",
